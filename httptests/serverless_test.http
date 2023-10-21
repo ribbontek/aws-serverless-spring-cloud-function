@@ -1,0 +1,37 @@
+### Send POST request with json body to members http endpoint
+POST {{baseUrl}}//members
+Content-Type: application/json
+
+{
+  "id": "{{$random.uuid}}"
+}
+
+### Send POST request with json body to teapot endpoint & expect 418 response
+POST {{baseUrl}}/teapot
+Content-Type: application/json
+
+{
+  "id": "{{$random.uuid}}",
+  "status": "EMPTY"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 418, "Response status is not 418");
+    });
+%}
+
+### Send POST request with json body to teapot endpoint & expect 200 response
+POST {{baseUrl}}/teapot
+Content-Type: application/json
+
+{
+  "id": "{{$random.uuid}}",
+  "status": "FULL"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}

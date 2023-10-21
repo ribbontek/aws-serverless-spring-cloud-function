@@ -1,0 +1,56 @@
+service: spring-cloud-functions
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: java17
+  timeout: 10
+  region: ap-southeast-2
+
+package:
+  artifact: build/libs/aws-serverless-spring-cloud-functions-0.0.1-SNAPSHOT-aws.jar
+
+functions:
+  members:
+    handler: org.springframework.cloud.function.adapter.aws.FunctionInvoker::handleRequest
+    events:
+      - http:
+          method: POST
+          path: /members
+          cors: true
+    environment:
+      FUNCTION_NAME: members
+
+  teapot:
+    handler: org.springframework.cloud.function.adapter.aws.FunctionInvoker::handleRequest
+    events:
+      - http:
+          method: POST
+          path: /teapot
+          cors: true
+    environment:
+      FUNCTION_NAME: teapot
+
+  scheduled-feign-job:
+    handler: org.springframework.cloud.function.adapter.aws.FunctionInvoker::handleRequest
+    events:
+      - schedule:
+          method: scheduler
+          rate:
+            - cron(0/5 * * * ? *)
+          enabled: true
+          input:
+            ids: [1234, 5678]
+    environment:
+      FUNCTION_NAME: scheduledFeignJob
+
+plugins:
+  - serverless-domain-manager
+
+custom:
+  customDomain:
+    domainName: sls.ribbontek.com
+    basePath: ''
+    stage: prod
+    createRoute53Record: true
